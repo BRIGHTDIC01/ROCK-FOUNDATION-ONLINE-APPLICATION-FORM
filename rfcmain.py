@@ -5,30 +5,49 @@ import os
 import pandas as pd
 from io import BytesIO
 
-# ---------------- DATABASE FUNCTIONS ----------------
+# ---------------- CONFIG ----------------
+st.set_page_config(page_title="Rock Foundation Academy", layout="centered")
+
+UPLOAD_DIR = "uploads"
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+
+ADMIN_PASSWORD = "Anonechonu$001."
+
+
+# ---------------- DATABASE ----------------
 def init_db():
     conn = sqlite3.connect("applications.db")
-    cursor = conn.cursor()
-    cursor.execute("""
+    c = conn.cursor()
+    c.execute("""
     CREATE TABLE IF NOT EXISTS applications (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         surname TEXT,
-        middle_name TEXT,
         first_name TEXT,
+        middle_name TEXT,
+        dob TEXT,
         age INTEGER,
+        gender TEXT,
+        nationality TEXT,
         class_of_entry TEXT,
-        religion TEXT,
-        place_of_worship TEXT,
-        phone TEXT,
-        state TEXT,
-        local_government TEXT,
-        email TEXT,
+        home_address TEXT,
+        state_of_residence TEXT,
+        guardian_name TEXT,
+        guardian_relationship TEXT,
+        guardian_phone TEXT,
+        guardian_email TEXT,
+        guardian_occupation TEXT,
+        previous_school TEXT,
+        school_address TEXT,
+        last_class TEXT,
+        reason_for_leaving TEXT,
         health_issues TEXT,
-        health_condition TEXT,
-        sponsor_name TEXT,
-        sponsor_phone TEXT,
+        health_details TEXT,
+        vocational_skill TEXT,
+        career_aspiration TEXT,
         extracurricular TEXT,
-        pledge TEXT,
+        how_heard TEXT,
+        additional_comments TEXT,
+        declaration TEXT,
         payment_proof TEXT,
         submitted_at TEXT
     )
@@ -38,31 +57,53 @@ def init_db():
 
 def insert_application(data):
     conn = sqlite3.connect("applications.db")
-    cursor = conn.cursor()
-    cursor.execute("""
-    INSERT INTO applications (
-        surname, middle_name, first_name, age, class_of_entry,
-        religion, place_of_worship, phone, state, local_government,
-        email, health_issues, health_condition,
-        sponsor_name, sponsor_phone, extracurricular,
-        pledge, payment_proof, submitted_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    c = conn.cursor()
+    c.execute("""
+    INSERT INTO applications VALUES (
+        NULL,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?
+    )
     """, data)
     conn.commit()
     conn.close()
 
 init_db()
 
+query_params = st.query_params
+is_admin = query_params.get("admin", ["false"])[0].lower() == "true"
+
+
 # ---------------- SIDEBAR ----------------
-st.sidebar.title("MENU")
-choice = st.sidebar.selectbox(
-    "Choose option",
-    ["Home", "Registration", "About", "Do Not Enter"],
-    key="menu"
-)
+if is_admin:
+    menu_options = ["Home", "Registration", "About", "Do not Enter"]
+else:
+    menu_options = ["Home", "Registration", "About"
+                    ]
+choice = st.sidebar.selectbox("Choose option", menu_options, key="menu")
 
 UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
+# ---------------- HOME ----------------
+if choice == "Home":
+    st.title("ROCK FOUNDATION ACADEMY & COLLEGE")
+    st.image("logo.jpg", width=120)
+    st.header("Official Online Admission Portal")
+    st.write("To Apply For Admission, Use The Menu Button And Select Register.")
+    st.image("upview.jpg", width=300)
+    st.image("secondary.jpg", width=350)
+    st.image("primary.jpg", width=350)
+    st.image("blue.jpg", width=400)
+    st.image("yellow.jpg", width=400)
+
+
+# ---------------- ABOUT ----------------
+elif choice == "About":
+    st.image("logo.jpg", width=120)
+    st.header("ABOUT US")
+    st.write(
+        "ROCK FOUNDATION ACADEMY AND COLLEGE was founded in 2012.\n\n"
+        "MISSION: To provide a conducive learning environment.\n\n"
+        "VISION: To produce well-informed future leaders."
+    )
 
 # ---------------- REGISTRATION ----------------
 if choice == "Registration":
@@ -82,15 +123,15 @@ if choice == "Registration":
         age = st.slider("Age", 3, 25)
         gender = st.selectbox("Gender", ["Male", "Female"])
         nationality = st.text_input("Nationality")
+        st.file_uploader("Upload Applicant's passport photograph")
 
         class_of_entry = st.selectbox(
             "Class of Entry",
-            ["Primary 1", "Primary 2", "Primary 3", "Primary 4", "Primary 5",
-             "JSS 1", "JSS 2", "JSS 3", "SSS 1", "SSS 2", "SSS 3"]
+            ["Primary 1","Primary 2","Primary 3","Primary 4","Primary 5",
+             "JSS 1","JSS 2","JSS 3","SSS 1","SSS 2","SSS 3"]
         )
 
         home_address = st.text_area("Home Address")
-
         state_of_residence = st.selectbox(
             "State of Residence",
             ["Abia", "Adamawa", "Akwa Ibom", "Anambra", "Bauchi", "Bayelsa",
@@ -115,6 +156,7 @@ if choice == "Registration":
         previous_school = st.text_input("Name of Previous School Attended")
         school_address = st.text_area("Address of Previous School")
         last_class = st.text_input("Last Class Completed")
+        st.file_uploader("Upload an image of Applicant's Last Result sheet")
         reason_for_leaving = st.text_area("Reason for Leaving Previous School")
 
         st.subheader("Health Information")
@@ -143,12 +185,10 @@ if choice == "Registration":
         extracurricular = st.text_input(
             "Extra-curricular Activities (Optional)"
         )
-
         how_heard = st.selectbox(
             "How did you hear about our school?",
             ["Friend/Family", "Church", "Social Media", "Banner", "Other"]
         )
-
         additional_comments = st.text_area("Additional Comments (Optional)")
 
         st.subheader("Declaration")
@@ -156,7 +196,6 @@ if choice == "Registration":
             "I hereby declare that the information provided is true and correct. "
             "I understand that providing false information may lead to disqualification."
         )
-
         st.subheader("Admission Form Fee")
         st.write("Primary= #3,000 , Secondary= #3,500")
 
@@ -170,7 +209,6 @@ if choice == "Registration":
             "Attach Payment Receipt",
             type=["jpg", "png", "pdf"]
         )
-
         submitted = st.form_submit_button("SUBMIT APPLICATION")
 
     if submitted:
@@ -183,16 +221,18 @@ if choice == "Registration":
             file_path = os.path.join(
                 UPLOAD_DIR, f"{surname}_{timestamp}_{payment_proof.name}"
             )
-
-            with open(file_path, "wb") as f:
+            with open(path, "wb") as f:
                 f.write(payment_proof.getbuffer())
 
             insert_application((
-                surname, middle_name, first_name, age, class_of_entry,
-                "", "", guardian_phone, state_of_residence, "",
-                guardian_email, has_health_issues, health_details,
-                guardian_name, guardian_phone, extracurricular,
-                "Agreed", file_path,
+                surname, first_name, middle_name, dob, age, gender,
+                nationality, class_of_entry, home_address, state_of_residence,
+                guardian_name, guardian_relationship, guardian_phone,
+                guardian_email, guardian_occupation,
+                previous_school, school_address, last_class, reason_for_leaving,
+                health_issues, health_details, vocational_skill,
+                career_aspiration, extracurricular, how_heard,
+                additional_comments, "Agreed", path,
                 datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             ))
 
@@ -201,84 +241,54 @@ if choice == "Registration":
                 "We will contact you after review."
             )
 
-# ---------------- HOME ----------------
-elif choice == "Home":
-    st.title("ROCK FOUNDATION ACADEMY STUDENT APPLICATION FORM")
-    st.image("logo.jpg", width=100)
-    st.header(
-        "This is the official website for applicants to register for study at "
-        "ROCK FOUNDATION ACADEMY AND COLLEGE"
-    )
-    st.subheader("To Register, Click the Menu option, Home and Registration.")
-    st.image("upview.jpg", width=250)
-    st.image("primary.jpg", width=250)
-    st.image("secondary.jpg", width=300)
-    st.image("yellow.jpg", width=350)
-    st.image("blue.jpg", width=350)
-# ---------------- ABOUT ----------------
-elif choice == "About":
-    st.header(
-        "ROCK FOUNDATION ACADEMY AND COLLEGE; "
-        "LAYING SOLID FOUNDATION FOR A GREAT NATION."
-    )
-    st.subheader("FOUNDED IN 2012.")
-    st.image("logo.jpg", width=100)
 
-    st.title("ABOUT US")
-    st.header("OUR MISSION:")
-    st.subheader(
-        "To Provide A Conducive Learning Environment In Which Every Child "
-        "Becomes Who They Ought To Be With The Help Of The Almighty God."
-    )
-
-    st.header("OUR VISION:")
-    st.subheader(
-        "To Produce Leaders Who Are Well Informed, Taught, And Developed "
-        "Positively To Face The Future And Stand Out Amidst So Many Competitors "
-        "In Their Generation."
-    )
-
-# ---------------- ADMIN PAGE ----------------
+# ---------------- ADMIN ----------------
 elif choice == "Do Not Enter":
 
-    st.title("ADMIN ACCESS ONLY 🚫")
+    if "admin" not in st.session_state:
+        st.session_state.admin = False
 
-    ADMIN_PASSWORD = "Anonechonu$001."
-
-    if "admin_authenticated" not in st.session_state:
-        st.session_state.admin_authenticated = False
-
-    if not st.session_state.admin_authenticated:
-        password = st.text_input("Enter Admin Password", type="password")
-
+    if not st.session_state.admin:
+        password = st.text_input("Admin Password", type="password")
         if st.button("Login"):
             if password == ADMIN_PASSWORD:
-                st.session_state.admin_authenticated = True
+                st.session_state.admin = True
                 st.success("Access granted")
             else:
                 st.error("Incorrect password")
         st.stop()
 
-    st.success("Welcome Admin")
+    st.title("ADMIN DASHBOARD")
 
     conn = sqlite3.connect("applications.db")
     df = pd.read_sql("SELECT * FROM applications", conn)
     conn.close()
 
-    if df.empty:
-        st.warning("No applications found.")
-    else:
-        st.dataframe(df)
+    st.dataframe(df)
 
-        output = BytesIO()
-        with pd.ExcelWriter(output, engine="xlsxwriter") as writer:
-            df.to_excel(writer, index=False)
+    st.subheader("View Payment Proof")
+    app_id = st.selectbox("Select Application ID", df["id"])
 
-        output.seek(0)
+    proof = df[df["id"] == app_id]["payment_proof"].values[0]
+    if os.path.exists(proof):
+        if proof.endswith((".jpg",".png")):
+            st.image(proof, width=400)
+        else:
+            with open(proof,"rb") as f:
+                st.download_button(
+                    "Download Receipt",
+                    f,
+                    file_name=os.path.basename(proof)
+                )
 
-        st.download_button(
-            "Download as Excel",
-            data=output,
-            file_name="applications.xlsx",
-            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        )
+    output = BytesIO()
+    with pd.ExcelWriter(output, engine="xlsxwriter") as writer:
+        df.to_excel(writer, index=False)
+    output.seek(0)
+
+    st.download_button(
+        "Download All Applications (Excel)",
+        data=output,
+        file_name="applications.xlsx",
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
