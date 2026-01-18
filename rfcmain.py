@@ -68,20 +68,20 @@ def insert_application(data):
 
 init_db()
 
-query_params = st.query_params
-is_admin = query_params.get("admin", ["false"])[0].lower() == "true"
+# ---------------- QUERY PARAMS (FIXED) ----------------
+params = st.experimental_get_query_params()
+is_admin = params.get("admin", ["false"])[0].lower() == "true"
 
 
 # ---------------- SIDEBAR ----------------
 if is_admin:
-    menu_options = ["Home", "Registration", "About", "Do not Enter"]
+    menu_options = ["Home", "Registration", "About", "Do Not Enter"]
 else:
-    menu_options = ["Home", "Registration", "About"
-                    ]
+    menu_options = ["Home", "Registration", "About"]
+
 choice = st.sidebar.selectbox("Choose option", menu_options, key="menu")
 
-UPLOAD_DIR = "uploads"
-os.makedirs(UPLOAD_DIR, exist_ok=True)
+
 # ---------------- HOME ----------------
 if choice == "Home":
     st.title("ROCK FOUNDATION ACADEMY & COLLEGE")
@@ -99,11 +99,16 @@ if choice == "Home":
 elif choice == "About":
     st.image("logo.jpg", width=120)
     st.header("ABOUT US")
-    st.write(
-        "ROCK FOUNDATION ACADEMY AND COLLEGE was founded in 2012.\n\n"
-        "MISSION: To provide a conducive learning environment.\n\n"
-        "VISION: To produce well-informed future leaders."
+    st.header("ROCK FOUNDATION ACADEMY AND COLLEGE was founded in 2012.")
+    st.header("MISSION")
+    st.subheader(
+        "To Provide A Conducive Learning Environment In Which Every Child Becomes Who They Ought To Be With The Help Of The Almighty God"
     )
+    st.header("VISION")
+    st.subheader(
+        "To Produce Leaders Who Are Well Informed,Taught, And Developed Positively To Face The Future And Stand Out Admist So Many Competitors In Their Generations."
+    )
+
 
 # ---------------- REGISTRATION ----------------
 if choice == "Registration":
@@ -182,9 +187,7 @@ if choice == "Registration":
             "Career Aspiration (What does the student want to become?)"
         )
 
-        extracurricular = st.text_input(
-            "Extra-curricular Activities (Optional)"
-        )
+        extracurricular = st.text_input("Extra-curricular Activities (Optional)")
         how_heard = st.selectbox(
             "How did you hear about our school?",
             ["Friend/Family", "Church", "Social Media", "Banner", "Other"]
@@ -196,19 +199,20 @@ if choice == "Registration":
             "I hereby declare that the information provided is true and correct. "
             "I understand that providing false information may lead to disqualification."
         )
+
         st.subheader("Admission Form Fee")
         st.write("Primary= #3,000 , Secondary= #3,500")
 
         st.subheader(
-            "Account Number 💵: 2007735304, Bank 🏦: FCMB, Account Name: ROCK-F ACADEMY LTD"
+            "Account Number 🏦: 2007735304, Bank 🏦: FCMB, Account Name: ROCK-F ACADEMY LTD"
         )
-        st.subheader(
-            "Cross check Bank Details before initiating transactions please. NO REFUNDS"
-        )
+        st.subheader("Cross check Bank Details before initiating transactions please. NO REFUNDS")
+
         payment_proof = st.file_uploader(
             "Attach Payment Receipt",
             type=["jpg", "png", "pdf"]
         )
+
         submitted = st.form_submit_button("SUBMIT APPLICATION")
 
     if submitted:
@@ -221,7 +225,7 @@ if choice == "Registration":
             file_path = os.path.join(
                 UPLOAD_DIR, f"{surname}_{timestamp}_{payment_proof.name}"
             )
-            with open(path, "wb") as f:
+            with open(file_path, "wb") as f:
                 f.write(payment_proof.getbuffer())
 
             insert_application((
@@ -232,7 +236,7 @@ if choice == "Registration":
                 previous_school, school_address, last_class, reason_for_leaving,
                 health_issues, health_details, vocational_skill,
                 career_aspiration, extracurricular, how_heard,
-                additional_comments, "Agreed", path,
+                additional_comments, "Agreed", file_path,
                 datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             ))
 
