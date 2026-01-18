@@ -1,8 +1,5 @@
 import os
 
-# FORCE RESET OLD DATABASE (RUNS ONCE)
-if os.path.exists("applications.db"):
-    os.remove("applications.db")
 import streamlit as st
 import sqlite3
 from datetime import datetime
@@ -78,7 +75,7 @@ def insert_application(data):
         ) VALUES (
             ?,?,?,?,?,?,?,?,?,?,
             ?,?,?,?,?,?,?,?,?,?,
-            ?,?,?,?,?,?,?,?,?,?
+            ?,?,?,?,?,?,?,?,?
         )
     """, data)
 
@@ -239,5 +236,4 @@ elif choice == "Do Not Enter":
     conn.close()
 
     st.dataframe(df)
-
 
