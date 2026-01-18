@@ -55,20 +55,33 @@ def init_db():
     conn.commit()
     conn.close()
 
+
 def insert_application(data):
     conn = sqlite3.connect("applications.db")
     c = conn.cursor()
     c.execute("""
-    INSERT INTO applications VALUES (
-        NULL,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?
+    INSERT INTO applications (
+        surname, first_name, middle_name, dob, age, gender, nationality,
+        class_of_entry, home_address, state_of_residence,
+        guardian_name, guardian_relationship, guardian_phone,
+        guardian_email, guardian_occupation,
+        previous_school, school_address, last_class, reason_for_leaving,
+        health_issues, health_details, vocational_skill,
+        career_aspiration, extracurricular, how_heard,
+        additional_comments, declaration, payment_proof, submitted_at
+    ) VALUES (
+        ?,?,?,?,?,?,?,?,?,?,
+        ?,?,?,?,?,?,?,?,?,?,
+        ?,?,?,?,?,?,?,?,?,?
     )
     """, data)
     conn.commit()
     conn.close()
 
+
 init_db()
 
-# ---------------- QUERY PARAMS (FIXED) ----------------
+# ---------------- QUERY PARAMS ----------------
 params = st.experimental_get_query_params()
 is_admin = params.get("admin", ["false"])[0].lower() == "true"
 
@@ -297,5 +310,3 @@ elif choice == "Do Not Enter":
         file_name="applications.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
-
-
