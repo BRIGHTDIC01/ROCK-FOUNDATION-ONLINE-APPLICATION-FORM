@@ -174,6 +174,7 @@ if choice == "Registration":
             health_details = st.text_input("Please specify the health issue")
         else:
             health_details = "None"
+        health_issues = has_health_issues
 
         st.subheader("Academic Interests")
         vocational_skill = st.selectbox(
@@ -296,3 +297,4 @@ elif choice == "Do Not Enter":
         file_name="applications.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
+
