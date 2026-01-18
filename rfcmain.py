@@ -107,6 +107,11 @@ if choice == "Home":
     st.image("logo.jpg", width=120)
     st.header("Official Online Admission Portal")
     st.write("To Apply For Admission, Use The Menu Button And Select Register.")
+    st.image("upview.jpg", width=300)
+    st.image("secondary.jpg", width=350)
+    st.image("primary.jpg", width=350)
+    st.image("blue.jpg", width=400)
+    st.image("yellow.jpg", width=400)
 
 
 # ---------------- ABOUT ----------------
@@ -226,3 +231,4 @@ elif choice == "Do Not Enter":
     conn.close()
 
     st.dataframe(df)
+
