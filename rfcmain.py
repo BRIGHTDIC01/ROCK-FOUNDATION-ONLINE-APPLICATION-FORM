@@ -130,8 +130,10 @@ elif choice == "About":
 
 # ---------------- REGISTRATION ----------------
 elif choice == "Registration":
+    st.title("ONLINE APPLICATION FORM")
 
     with st.form("application_form"):
+        st.title("STUDENT'S INFORMATION")
 
         surname = st.text_input("Surname")
         first_name = st.text_input("First Name")
@@ -150,6 +152,8 @@ elif choice == "Registration":
         home_address = st.text_area("Home Address")
         state_of_residence = st.text_input("State of Residence")
 
+        st.title("PARENT'S/ GUARDIAN'S INFORMATION")
+
         guardian_name = st.text_input("Parent/Guardian Full Name")
         guardian_relationship = st.selectbox(
             "Relationship to Student",
@@ -158,6 +162,8 @@ elif choice == "Registration":
         guardian_phone = st.text_input("Parent/Guardian Phone Number")
         guardian_email = st.text_input("Parent/Guardian Email Address")
         guardian_occupation = st.text_input("Parent/Guardian Occupation")
+
+        st.title("PREVIOUS SCHOOL INFORMATION")
 
         previous_school = st.text_input("Name of Previous School Attended")
         school_address = st.text_area("Address of Previous School")
@@ -173,6 +179,8 @@ elif choice == "Registration":
             health_details = st.text_input("Please specify the health issue")
         else:
             health_details = "None"
+
+        st.title("STUDENT'S INTEREST")
 
         vocational_skill = st.text_input("Vocational skill of interest")
         career_aspiration = st.text_input("Career Aspiration")
@@ -231,4 +239,5 @@ elif choice == "Do Not Enter":
     conn.close()
 
     st.dataframe(df)
+
 
