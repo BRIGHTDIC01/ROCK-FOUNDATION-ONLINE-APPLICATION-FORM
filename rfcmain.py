@@ -1,3 +1,8 @@
+import os
+
+# FORCE RESET OLD DATABASE (RUNS ONCE)
+if os.path.exists("applications.db"):
+    os.remove("applications.db")
 import streamlit as st
 import sqlite3
 from datetime import datetime
@@ -59,22 +64,24 @@ def init_db():
 def insert_application(data):
     conn = sqlite3.connect("applications.db")
     c = conn.cursor()
+
     c.execute("""
-    INSERT INTO applications (
-        surname, first_name, middle_name, dob, age, gender, nationality,
-        class_of_entry, home_address, state_of_residence,
-        guardian_name, guardian_relationship, guardian_phone,
-        guardian_email, guardian_occupation,
-        previous_school, school_address, last_class, reason_for_leaving,
-        health_issues, health_details, vocational_skill,
-        career_aspiration, extracurricular, how_heard,
-        additional_comments, declaration, payment_proof, submitted_at
-    ) VALUES (
-        ?,?,?,?,?,?,?,?,?,?,
-        ?,?,?,?,?,?,?,?,?,?,
-        ?,?,?,?,?,?,?,?,?,?
-    )
+        INSERT INTO applications (
+            surname, first_name, middle_name, dob, age, gender, nationality,
+            class_of_entry, home_address, state_of_residence,
+            guardian_name, guardian_relationship, guardian_phone,
+            guardian_email, guardian_occupation,
+            previous_school, school_address, last_class, reason_for_leaving,
+            health_issues, health_details, vocational_skill,
+            career_aspiration, extracurricular, how_heard,
+            additional_comments, declaration, payment_proof, submitted_at
+        ) VALUES (
+            ?,?,?,?,?,?,?,?,?,?,
+            ?,?,?,?,?,?,?,?,?,?,
+            ?,?,?,?,?,?,?,?,?,?
+        )
     """, data)
+
     conn.commit()
     conn.close()
 
@@ -87,12 +94,11 @@ is_admin = params.get("admin", ["false"])[0].lower() == "true"
 
 
 # ---------------- SIDEBAR ----------------
+menu_options = ["Home", "Registration", "About"]
 if is_admin:
-    menu_options = ["Home", "Registration", "About", "Do Not Enter"]
-else:
-    menu_options = ["Home", "Registration", "About"]
+    menu_options.append("Do Not Enter")
 
-choice = st.sidebar.selectbox("Choose option", menu_options, key="menu")
+choice = st.sidebar.selectbox("Choose option", menu_options)
 
 
 # ---------------- HOME ----------------
@@ -101,11 +107,6 @@ if choice == "Home":
     st.image("logo.jpg", width=120)
     st.header("Official Online Admission Portal")
     st.write("To Apply For Admission, Use The Menu Button And Select Register.")
-    st.image("upview.jpg", width=300)
-    st.image("secondary.jpg", width=350)
-    st.image("primary.jpg", width=350)
-    st.image("blue.jpg", width=400)
-    st.image("yellow.jpg", width=400)
 
 
 # ---------------- ABOUT ----------------
@@ -122,18 +123,11 @@ elif choice == "About":
         "To Produce Leaders Who Are Well Informed,Taught, And Developed Positively To Face The Future And Stand Out Admist So Many Competitors In Their Generations."
     )
 
-
 # ---------------- REGISTRATION ----------------
-if choice == "Registration":
+elif choice == "Registration":
 
-    with st.form(key="application_form"):
+    with st.form("application_form"):
 
-        st.title("STUDENT APPLICATION FORM")
-        st.header("Rock Foundation Academy & College")
-        st.write("Please fill in all details accurately before submission.")
-        st.image("logo.jpg", width=120)
-
-        st.subheader("Student Information")
         surname = st.text_input("Surname")
         first_name = st.text_input("First Name")
         middle_name = st.text_input("Middle Name (Optional)")
@@ -141,7 +135,6 @@ if choice == "Registration":
         age = st.slider("Age", 3, 25)
         gender = st.selectbox("Gender", ["Male", "Female"])
         nationality = st.text_input("Nationality")
-        st.file_uploader("Upload Applicant's passport photograph")
 
         class_of_entry = st.selectbox(
             "Class of Entry",
@@ -150,17 +143,8 @@ if choice == "Registration":
         )
 
         home_address = st.text_area("Home Address")
-        state_of_residence = st.selectbox(
-            "State of Residence",
-            ["Abia", "Adamawa", "Akwa Ibom", "Anambra", "Bauchi", "Bayelsa",
-             "Benue", "Borno", "Cross River", "Delta", "Ebonyi", "Edo",
-             "Ekiti", "Enugu", "Gombe", "Imo", "Jigawa", "Kaduna", "Kano",
-             "Katsina", "Kebbi", "Kogi", "Kwara", "Lagos", "Nasarawa",
-             "Niger", "Ogun", "Ondo", "Osun", "Oyo", "Plateau", "Rivers",
-             "Sokoto", "Taraba", "Yobe", "Zamfara"]
-        )
+        state_of_residence = st.text_input("State of Residence")
 
-        st.subheader("Parent / Guardian Information")
         guardian_name = st.text_input("Parent/Guardian Full Name")
         guardian_relationship = st.selectbox(
             "Relationship to Student",
@@ -170,14 +154,11 @@ if choice == "Registration":
         guardian_email = st.text_input("Parent/Guardian Email Address")
         guardian_occupation = st.text_input("Parent/Guardian Occupation")
 
-        st.subheader("Previous School Information")
         previous_school = st.text_input("Name of Previous School Attended")
         school_address = st.text_area("Address of Previous School")
         last_class = st.text_input("Last Class Completed")
-        st.file_uploader("Upload an image of Applicant's Last Result sheet")
         reason_for_leaving = st.text_area("Reason for Leaving Previous School")
 
-        st.subheader("Health Information")
         has_health_issues = st.selectbox(
             "Does the student have any health issues?",
             ["No", "Yes"]
@@ -187,93 +168,55 @@ if choice == "Registration":
             health_details = st.text_input("Please specify the health issue")
         else:
             health_details = "None"
-        health_issues = has_health_issues
 
-        st.subheader("Academic Interests")
-        vocational_skill = st.selectbox(
-            "Vocational skill of interest",
-            ["select option", "paint production", "Confectionary/ Baking",
-             "cosmetology", "make-up", "Barbing", "Catering",
-             "Hair dressing", "Arts & Craft", "Interlock production"]
-        )
+        vocational_skill = st.text_input("Vocational skill of interest")
+        career_aspiration = st.text_input("Career Aspiration")
+        extracurricular = st.text_input("Extra-curricular Activities")
+        how_heard = st.text_input("How did you hear about our school?")
+        additional_comments = st.text_area("Additional Comments")
 
-        career_aspiration = st.text_input(
-            "Career Aspiration (What does the student want to become?)"
-        )
-
-        extracurricular = st.text_input("Extra-curricular Activities (Optional)")
-        how_heard = st.selectbox(
-            "How did you hear about our school?",
-            ["Friend/Family", "Church", "Social Media", "Banner", "Other"]
-        )
-        additional_comments = st.text_area("Additional Comments (Optional)")
-
-        st.subheader("Declaration")
         declaration = st.checkbox(
-            "I hereby declare that the information provided is true and correct. "
-            "I understand that providing false information may lead to disqualification."
+            "I hereby declare that the information provided is correct"
         )
-
-        st.subheader("Admission Form Fee")
-        st.write("Primary= #3,000 , Secondary= #3,500")
-
-        st.subheader(
-            "Account Number 🏦: 2007735304, Bank 🏦: FCMB, Account Name: ROCK-F ACADEMY LTD"
-        )
-        st.subheader("Cross check Bank Details before initiating transactions please. NO REFUNDS")
 
         payment_proof = st.file_uploader(
-            "Attach Payment Receipt",
-            type=["jpg", "png", "pdf"]
+            "Attach Payment Receipt", type=["jpg","png","pdf"]
         )
 
         submitted = st.form_submit_button("SUBMIT APPLICATION")
 
     if submitted:
-        if not declaration:
-            st.error("You must accept the declaration.")
-        elif payment_proof is None:
-            st.error("Payment receipt is required.")
+        if not declaration or not payment_proof:
+            st.error("Declaration and payment receipt are required.")
         else:
             timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
             file_path = os.path.join(
                 UPLOAD_DIR, f"{surname}_{timestamp}_{payment_proof.name}"
             )
+
             with open(file_path, "wb") as f:
                 f.write(payment_proof.getbuffer())
 
             insert_application((
-                surname, first_name, middle_name, dob, age, gender,
-                nationality, class_of_entry, home_address, state_of_residence,
+                surname, first_name, middle_name, dob, age, gender, nationality,
+                class_of_entry, home_address, state_of_residence,
                 guardian_name, guardian_relationship, guardian_phone,
                 guardian_email, guardian_occupation,
                 previous_school, school_address, last_class, reason_for_leaving,
-                health_issues, health_details, vocational_skill,
+                has_health_issues, health_details, vocational_skill,
                 career_aspiration, extracurricular, how_heard,
                 additional_comments, "Agreed", file_path,
                 datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             ))
 
-            st.success(
-                "Thank you! Your application has been submitted successfully. "
-                "We will contact you after review."
-            )
+            st.success("Application submitted successfully!")
 
 
 # ---------------- ADMIN ----------------
 elif choice == "Do Not Enter":
 
-    if "admin" not in st.session_state:
-        st.session_state.admin = False
-
-    if not st.session_state.admin:
-        password = st.text_input("Admin Password", type="password")
-        if st.button("Login"):
-            if password == ADMIN_PASSWORD:
-                st.session_state.admin = True
-                st.success("Access granted")
-            else:
-                st.error("Incorrect password")
+    password = st.text_input("Admin Password", type="password")
+    if password != ADMIN_PASSWORD:
         st.stop()
 
     st.title("ADMIN DASHBOARD")
@@ -283,30 +226,3 @@ elif choice == "Do Not Enter":
     conn.close()
 
     st.dataframe(df)
-
-    st.subheader("View Payment Proof")
-    app_id = st.selectbox("Select Application ID", df["id"])
-
-    proof = df[df["id"] == app_id]["payment_proof"].values[0]
-    if os.path.exists(proof):
-        if proof.endswith((".jpg",".png")):
-            st.image(proof, width=400)
-        else:
-            with open(proof,"rb") as f:
-                st.download_button(
-                    "Download Receipt",
-                    f,
-                    file_name=os.path.basename(proof)
-                )
-
-    output = BytesIO()
-    with pd.ExcelWriter(output, engine="xlsxwriter") as writer:
-        df.to_excel(writer, index=False)
-    output.seek(0)
-
-    st.download_button(
-        "Download All Applications (Excel)",
-        data=output,
-        file_name="applications.xlsx",
-        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    )
