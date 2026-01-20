@@ -189,6 +189,13 @@ elif choice == "Registration":
             "I hereby declare that the information provided is correct"
         )
 
+        st.subheader("Admission Form Fee")
+        st.write("Primary= #3,000 , Secondary= #3,500")
+
+        st.subheader(
+            "Account Number 🏦: 2007735304, Bank 🏦: FCMB, Account Name: ROCK-F ACADEMY LTD"
+        )
+        st.subheader("Cross check Bank Details before initiating transactions please. NO REFUNDS")
         payment_proof = st.file_uploader(
             "Attach Payment Receipt", type=["jpg","png","pdf"]
         )
@@ -236,4 +243,5 @@ elif choice == "Do Not Enter":
     conn.close()
 
     st.dataframe(df)
+
 
