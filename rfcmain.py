@@ -244,4 +244,28 @@ elif choice == "Do Not Enter":
 
     st.dataframe(df)
 
+    # ---------- VIEW PAYMENT PROOF ----------
+    st.subheader("View Payment Proof")
 
+    if df.empty:
+        st.info("No applications submitted yet.")
+        st.stop()
+
+    app_id = st.selectbox("Select Application ID", df["id"])
+
+    proof_path = df[df["id"] == app_id]["payment_proof"].values[0]
+
+    if proof_path and os.path.exists(proof_path):
+        if proof_path.lower().endswith((".jpg", ".jpeg", ".png")):
+            st.image(proof_path, caption="Payment Receipt", width=400)
+
+        elif proof_path.lower().endswith(".pdf"):
+            with open(proof_path, "rb") as f:
+                st.download_button(
+                    "Download Payment Receipt (PDF)",
+                    data=f,
+                    file_name=os.path.basename(proof_path),
+                    mime="application/pdf"
+                )
+    else:
+        st.warning("Payment proof file not found.")
